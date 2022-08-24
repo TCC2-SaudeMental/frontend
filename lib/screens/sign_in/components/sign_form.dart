@@ -4,10 +4,13 @@ import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
 import 'package:shop_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:shop_app/screens/login_success/login_success_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../components/default_button.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
+import '../../../services/storage.dart';
 
 class SignForm extends StatefulWidget {
   @override
@@ -33,6 +36,22 @@ class _SignFormState extends State<SignForm> {
       setState(() {
         errors.remove(error);
       });
+  }
+
+  void createAlbum() async {
+    final response = await http.post(
+      Uri.parse('https://tcc2-api.herokuapp.com/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String?>{
+        'email': this.email,
+        'password': this.password,
+      }),
+    );
+    final body = jsonDecode(response.body);
+
+    await secureStorage.write(key: 'jwt', value: body['data']['token']);
   }
 
   @override
@@ -77,7 +96,7 @@ class _SignFormState extends State<SignForm> {
                 _formKey.currentState!.save();
                 // if all are valid then go to success screen
                 KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                this.createAlbum();
               }
             },
           ),
