@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
-import 'package:shop_app/screens/forgot_password/forgot_password_screen.dart';
-import 'package:shop_app/screens/login_success/login_success_screen.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:flash/flash.dart';
 import 'dart:convert';
 
 import '../../../components/default_button.dart';
@@ -38,7 +38,7 @@ class _SignFormState extends State<SignForm> {
       });
   }
 
-  void createAlbum() async {
+  void logIn() async {
     final response = await http.post(
       Uri.parse('https://tcc2-api.herokuapp.com/login'),
       headers: <String, String>{
@@ -49,9 +49,17 @@ class _SignFormState extends State<SignForm> {
         'password': this.password,
       }),
     );
+
     final body = jsonDecode(response.body);
 
-    await secureStorage.write(key: 'jwt', value: body['data']['token']);
+    if (response.statusCode == 400) {
+      _showErrorFlash(body['data']['login'][0]);
+    } else if (response.statusCode == 500) {
+      _showErrorFlash("Erro no servidor");
+    } else {
+      await secureStorage.write(key: 'jwt', value: body['data']['token']);
+      Navigator.pushNamed(context, HomeScreen.routeName);
+    }
   }
 
   @override
@@ -64,29 +72,6 @@ class _SignFormState extends State<SignForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          Row(
-            children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value;
-                  });
-                },
-              ),
-              Text("Lembre-me"),
-              Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                    context, ForgotPasswordScreen.routeName),
-                child: Text(
-                  "Esqueceu sua senha",
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              )
-            ],
-          ),
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
@@ -96,7 +81,7 @@ class _SignFormState extends State<SignForm> {
                 _formKey.currentState!.save();
                 // if all are valid then go to success screen
                 KeyboardUtil.hideKeyboard(context);
-                this.createAlbum();
+                this.logIn();
               }
             },
           ),
@@ -168,6 +153,43 @@ class _SignFormState extends State<SignForm> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
+    );
+  }
+
+  void _showErrorFlash(
+    String message, {
+    bool persistent = true,
+    EdgeInsets margin = EdgeInsets.zero,
+  }) {
+    showFlash(
+      context: context,
+      persistent: persistent,
+      builder: (_, controller) {
+        return Flash(
+          controller: controller,
+          margin: margin,
+          behavior: FlashBehavior.fixed,
+          position: FlashPosition.bottom,
+          borderRadius: BorderRadius.circular(8.0),
+          borderColor: Colors.black,
+          boxShadows: kElevationToShadow[8],
+          onTap: () => controller.dismiss(),
+          forwardAnimationCurve: Curves.easeInCirc,
+          reverseAnimationCurve: Curves.bounceIn,
+          child: DefaultTextStyle(
+            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+            child: FlashBar(
+              content: Text(message),
+              indicatorColor: Colors.red,
+              icon: Icon(Icons.info_outline),
+              primaryAction: TextButton(
+                onPressed: () => controller.dismiss(),
+                child: Text('DISMISS'),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -20,13 +20,8 @@ class _BodyState extends State<Body> {
       "image": "assets/images/splash_4.png"
     },
     {
-      "text":
-          "We help people conect with store \naround United State of America",
-      "image": "assets/images/splash_2.png"
-    },
-    {
-      "text": "We show the easy way to shop. \nJust stay at home with us",
-      "image": "assets/images/splash_3.png"
+      "text": "Acompanhamento diário de estado emocional",
+      "image": "assets/images/splash_4.png"
     },
   ];
   @override
