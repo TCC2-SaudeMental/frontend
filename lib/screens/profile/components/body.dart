@@ -21,7 +21,8 @@ class Body extends StatelessWidget {
             icon: "assets/icons/Log out.svg",
             press: () async {
               await secureStorage.deleteAll();
-              Navigator.pushNamed(context, SignInScreen.routeName);
+              Navigator.popUntil(
+                  context, ModalRoute.withName(SignInScreen.routeName));
             },
           ),
         ],

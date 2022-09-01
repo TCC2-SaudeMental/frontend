@@ -4,13 +4,13 @@ import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
 import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:flash/flash.dart';
 import 'dart:convert';
 
 import '../../../components/default_button.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
 import '../../../services/storage.dart';
+import '../../../services/flash_message.dart';
 
 class SignForm extends StatefulWidget {
   @override
@@ -53,9 +53,9 @@ class _SignFormState extends State<SignForm> {
     final body = jsonDecode(response.body);
 
     if (response.statusCode == 400) {
-      _showErrorFlash(body['data']['login'][0]);
+      showErrorFlash(body['data']['login'][0], context);
     } else if (response.statusCode == 500) {
-      _showErrorFlash("Erro no servidor");
+      showErrorFlash("Erro no servidor", context);
     } else {
       await secureStorage.write(key: 'jwt', value: body['data']['token']);
       Navigator.pushNamed(context, HomeScreen.routeName);
@@ -153,43 +153,6 @@ class _SignFormState extends State<SignForm> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
-    );
-  }
-
-  void _showErrorFlash(
-    String message, {
-    bool persistent = true,
-    EdgeInsets margin = EdgeInsets.zero,
-  }) {
-    showFlash(
-      context: context,
-      persistent: persistent,
-      builder: (_, controller) {
-        return Flash(
-          controller: controller,
-          margin: margin,
-          behavior: FlashBehavior.fixed,
-          position: FlashPosition.bottom,
-          borderRadius: BorderRadius.circular(8.0),
-          borderColor: Colors.black,
-          boxShadows: kElevationToShadow[8],
-          onTap: () => controller.dismiss(),
-          forwardAnimationCurve: Curves.easeInCirc,
-          reverseAnimationCurve: Curves.bounceIn,
-          child: DefaultTextStyle(
-            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-            child: FlashBar(
-              content: Text(message),
-              indicatorColor: Colors.red,
-              icon: Icon(Icons.info_outline),
-              primaryAction: TextButton(
-                onPressed: () => controller.dismiss(),
-                child: Text('DISMISS'),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
