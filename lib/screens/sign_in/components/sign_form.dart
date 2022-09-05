@@ -59,6 +59,7 @@ class _SignFormState extends State<SignForm> {
     } else {
       await secureStorage.write(key: 'jwt', value: body['data']['token']);
       Navigator.pushNamed(context, HomeScreen.routeName);
+      showSuccessFlash("Bem vindo", context);
     }
   }
 
