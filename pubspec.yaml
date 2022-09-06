@@ -33,6 +33,7 @@ dependencies:
   http: ^0.13.5
   flutter_secure_storage: ^6.0.0
   flash: ^2.0.3+3
+  jiffy: ^5.0.0
 
 dev_dependencies:
   flutter_test:
