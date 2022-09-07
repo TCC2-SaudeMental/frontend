@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 import '../../../services/storage.dart';
 
@@ -23,6 +24,8 @@ class _StreakCounterState extends State<StreakCounter> {
       return;
     }
 
+    EasyLoading.show(status: 'Carregando...');
+
     final response = await http.get(
       Uri.parse('https://tcc2-api.herokuapp.com/auth/user'),
       headers: <String, String>{
@@ -37,6 +40,7 @@ class _StreakCounterState extends State<StreakCounter> {
     setState(() {
       streak = new_streak;
     });
+    EasyLoading.dismiss();
   }
 
   Widget build(BuildContext context) {

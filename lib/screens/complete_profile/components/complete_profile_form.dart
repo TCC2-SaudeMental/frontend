@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'dart:convert';
 import '../../../size_config.dart';
@@ -31,6 +32,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       return;
     }
 
+    EasyLoading.show(status: 'Carregando...');
+
     final response = await http.get(
       Uri.parse('https://tcc2-api.herokuapp.com/auth/user'),
       headers: <String, String>{
@@ -51,6 +54,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         text: fetchedName,
       );
     });
+    EasyLoading.dismiss();
   }
 
   @override

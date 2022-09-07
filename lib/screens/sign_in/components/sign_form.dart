@@ -39,17 +39,17 @@ class _SignFormState extends State<SignForm> {
   }
 
   void logIn() async {
+    final String form_email = this.email.toString().replaceAll(' ', '');
     final response = await http.post(
       Uri.parse('https://tcc2-api.herokuapp.com/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String?>{
-        'email': this.email,
+        'email': form_email,
         'password': this.password,
       }),
     );
-
     final body = jsonDecode(response.body);
 
     if (response.statusCode == 400) {

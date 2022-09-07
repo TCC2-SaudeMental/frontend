@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 import '../../../services/storage.dart';
 import '../../../size_config.dart';
@@ -24,6 +25,7 @@ class _StreamListState extends State<StreamList> {
     if (token == null) {
       return;
     }
+    EasyLoading.show(status: 'Carregando...');
 
     final response = await http.get(
       Uri.parse('https://tcc2-api.herokuapp.com/stream/report'),
@@ -38,6 +40,7 @@ class _StreamListState extends State<StreamList> {
     setState(() {
       streams = aux;
     });
+    EasyLoading.dismiss();
   }
 
   List<StreamCard> getCardList() {
