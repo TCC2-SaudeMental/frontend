@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../size_config.dart';
-import 'discount_banner.dart';
+import 'stream_list.dart';
 import 'home_header.dart';
 
 class Body extends StatelessWidget {
@@ -13,7 +13,10 @@ class Body extends StatelessWidget {
           children: [
             SizedBox(height: getProportionateScreenHeight(20)),
             HomeHeader(),
-            DiscountBanner(),
+            Container(
+              margin: EdgeInsets.only(top: getProportionateScreenWidth(10)),
+            ),
+            StreamList(),
           ],
         ),
       ),

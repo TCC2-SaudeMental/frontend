@@ -8,7 +8,7 @@ import 'package:shop_app/screens/otp/otp_screen.dart';
 import 'package:shop_app/screens/profile/profile_screen.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
-import 'package:shop_app/screens/add_stream/add_stream_screen.dart';
+import './screens/answer/answer_screen.dart';
 
 import 'screens/sign_up/sign_up_screen.dart';
 
@@ -25,4 +25,5 @@ final Map<String, WidgetBuilder> routes = {
   OtpScreen.routeName: (context) => OtpScreen(),
   HomeScreen.routeName: (context) => HomeScreen(),
   ProfileScreen.routeName: (context) => ProfileScreen(),
+  'Answer': (context) => AnswerScreen(),
 };

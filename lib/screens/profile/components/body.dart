@@ -3,6 +3,7 @@ import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
 import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 
 import 'profile_menu.dart';
+import './streak_counter.dart';
 import '../../../services/storage.dart';
 
 class Body extends StatelessWidget {
@@ -12,8 +13,9 @@ class Body extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 20),
       child: Column(
         children: [
+          StreakCounter(),
           ProfileMenu(
-            text: "My Account",
+            text: "Minha Conta",
             icon: "assets/icons/User Icon.svg",
             press: () {
               Navigator.pushNamed(context, CompleteProfileScreen.routeName);
