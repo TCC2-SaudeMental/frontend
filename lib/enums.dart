@@ -1,1 +1,1 @@
-enum MenuState { home, favourite, message, profile }
+enum MenuState { home, add_stream, favourite, message, profile }
