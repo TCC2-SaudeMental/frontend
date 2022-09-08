@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
+import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 
 import 'profile_menu.dart';
-import 'profile_pic.dart';
+import './streak_counter.dart';
+import '../../../services/storage.dart';
 
 class Body extends StatelessWidget {
   @override
@@ -10,32 +13,22 @@ class Body extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 20),
       child: Column(
         children: [
-          ProfilePic(),
-          SizedBox(height: 20),
+          StreakCounter(),
           ProfileMenu(
-            text: "My Account",
+            text: "Minha Conta",
             icon: "assets/icons/User Icon.svg",
-            press: () => {},
-          ),
-          ProfileMenu(
-            text: "Notifications",
-            icon: "assets/icons/Bell.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Settings",
-            icon: "assets/icons/Settings.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Help Center",
-            icon: "assets/icons/Question mark.svg",
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+            },
           ),
           ProfileMenu(
             text: "Log Out",
             icon: "assets/icons/Log out.svg",
-            press: () {},
+            press: () async {
+              await secureStorage.deleteAll();
+              Navigator.popUntil(
+                  context, ModalRoute.withName(SignInScreen.routeName));
+            },
           ),
         ],
       ),

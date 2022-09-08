@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/screens/home/home_screen.dart';
+import 'package:shop_app/screens/add_stream/add_stream_screen.dart';
 import 'package:shop_app/screens/profile/profile_screen.dart';
 
 import '../constants.dart';
@@ -49,8 +50,13 @@ class CustomBottomNavBar extends StatelessWidget {
                     Navigator.pushNamed(context, HomeScreen.routeName),
               ),
               IconButton(
-                icon: SvgPicture.asset("assets/icons/Plus Icon.svg"),
-                onPressed: () {},
+                icon: SvgPicture.asset("assets/icons/Plus Icon.svg",
+                  color: MenuState.add_stream == selectedMenu
+                      ? kPrimaryColor
+                      : inActiveIconColor,
+                ),
+                onPressed: () =>
+                    Navigator.pushNamed(context, AddStreamScreen.routeName),
               ),
               IconButton(
                 icon: SvgPicture.asset(

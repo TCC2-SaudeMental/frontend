@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
-import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
+import 'package:http/http.dart' as http;
 
+import 'dart:convert';
 import '../../../constants.dart';
 import '../../../size_config.dart';
-
+import '../../../services/flash_message.dart';
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  String? name;
   String? email;
   String? password;
   String? conform_password;
@@ -35,12 +37,40 @@ class _SignUpFormState extends State<SignUpForm> {
       });
   }
 
+  void registerUser() async {
+    final response = await http.post(
+      Uri.parse('https://tcc2-api.herokuapp.com/signup'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String?>{
+        'name': this.name,
+        'email': this.email,
+        'password': this.password,
+        'confirm_password': this.conform_password,
+      }),
+    );
+
+    final body = jsonDecode(response.body);
+
+    if (response.statusCode == 400) {
+      showErrorFlash(body['data']['email'][0], context);
+    } else if (response.statusCode == 500) {
+      showErrorFlash("Erro no servidor", context);
+    } else {
+      showSuccessFlash("Usuário criado com sucesso", context);
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
         children: [
+          buildNameFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
@@ -54,11 +84,43 @@ class _SignUpFormState extends State<SignUpForm> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 // if all are valid then go to success screen
-                Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                registerUser();
               }
             },
           ),
         ],
+      ),
+    );
+  }
+
+  TextFormField buildNameFormField() {
+    return TextFormField(
+      onSaved: (newValue) => name = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNamelNullError);
+        } else if (value.length > 2) {
+          removeError(error: "Name too short");
+        }
+        name = value;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: kNamelNullError);
+          return "";
+        } else if (value.length < 2) {
+          addError(error: "Name too short");
+          return "";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: "Name",
+        hintText: "Insira o seu Nome",
+        // If  you are using latest version of flutter then lable text and hint text shown like this
+        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
     );
   }

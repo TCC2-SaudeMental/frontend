@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
-import 'package:shop_app/screens/forgot_password/forgot_password_screen.dart';
-import 'package:shop_app/screens/login_success/login_success_screen.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../components/default_button.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
+import '../../../services/storage.dart';
+import '../../../services/flash_message.dart';
 
 class SignForm extends StatefulWidget {
   @override
@@ -35,6 +38,31 @@ class _SignFormState extends State<SignForm> {
       });
   }
 
+  void logIn() async {
+    final String form_email = this.email.toString().replaceAll(' ', '');
+    final response = await http.post(
+      Uri.parse('https://tcc2-api.herokuapp.com/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String?>{
+        'email': form_email,
+        'password': this.password,
+      }),
+    );
+    final body = jsonDecode(response.body);
+
+    if (response.statusCode == 400) {
+      showErrorFlash(body['data']['login'][0], context);
+    } else if (response.statusCode == 500) {
+      showErrorFlash("Erro no servidor", context);
+    } else {
+      await secureStorage.write(key: 'jwt', value: body['data']['token']);
+      Navigator.pushNamed(context, HomeScreen.routeName);
+      showSuccessFlash("Bem vindo", context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -45,29 +73,6 @@ class _SignFormState extends State<SignForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          Row(
-            children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value;
-                  });
-                },
-              ),
-              Text("Lembre-me"),
-              Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                    context, ForgotPasswordScreen.routeName),
-                child: Text(
-                  "Esqueceu sua senha",
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              )
-            ],
-          ),
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
@@ -77,7 +82,7 @@ class _SignFormState extends State<SignForm> {
                 _formKey.currentState!.save();
                 // if all are valid then go to success screen
                 KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                this.logIn();
               }
             },
           ),

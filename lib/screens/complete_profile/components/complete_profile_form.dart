@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
-import 'package:shop_app/components/default_button.dart';
-import 'package:shop_app/components/form_error.dart';
-import 'package:shop_app/screens/otp/otp_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-import '../../../constants.dart';
+import 'dart:convert';
 import '../../../size_config.dart';
+import '../../../services/storage.dart';
 
 class CompleteProfileForm extends StatefulWidget {
   @override
@@ -14,24 +14,47 @@ class CompleteProfileForm extends StatefulWidget {
 
 class _CompleteProfileFormState extends State<CompleteProfileForm> {
   final _formKey = GlobalKey<FormState>();
-  final List<String?> errors = [];
-  String? firstName;
-  String? lastName;
-  String? phoneNumber;
-  String? address;
 
-  void addError({String? error}) {
-    if (!errors.contains(error))
-      setState(() {
-        errors.add(error);
-      });
+  final TextEditingController _nameController =
+      TextEditingController(text: '...');
+  final TextEditingController _emailController =
+      TextEditingController(text: '...');
+
+  @override
+  void initState() {
+    super.initState();
+    retrieveData();
   }
 
-  void removeError({String? error}) {
-    if (errors.contains(error))
-      setState(() {
-        errors.remove(error);
-      });
+  void retrieveData() async {
+    String? token = await secureStorage.read(key: 'jwt');
+    if (token == null) {
+      return;
+    }
+
+    EasyLoading.show(status: 'Carregando...');
+
+    final response = await http.get(
+      Uri.parse('https://tcc2-api.herokuapp.com/auth/user'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${token}'
+      },
+    );
+
+    final body = jsonDecode(response.body);
+
+    String fetchedName = body['data']['user']['name'];
+    String fetchedEmail = body['data']['user']['email'];
+    setState(() {
+      _emailController.value = _emailController.value.copyWith(
+        text: fetchedEmail,
+      );
+      _nameController.value = _emailController.value.copyWith(
+        text: fetchedName,
+      );
+    });
+    EasyLoading.dismiss();
   }
 
   @override
@@ -42,117 +65,32 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         children: [
           buildFirstNameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          buildLastNameFormField(),
+          buildEmailFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          buildPhoneNumberFormField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
-          buildAddressFormField(),
-          FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(40)),
-          DefaultButton(
-            text: "prosseguir",
-            press: () {
-              if (_formKey.currentState!.validate()) {
-                Navigator.pushNamed(context, OtpScreen.routeName);
-              }
-            },
-          ),
         ],
       ),
     );
   }
 
-  TextFormField buildAddressFormField() {
+  TextFormField buildEmailFormField() {
     return TextFormField(
-      onSaved: (newValue) => address = newValue,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kAddressNullError);
-        }
-        return null;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kAddressNullError);
-          return "";
-        }
-        return null;
-      },
+      readOnly: true,
+      controller: _emailController,
       decoration: InputDecoration(
-        labelText: "Address",
-        hintText: "Enter your phone address",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        labelText: "Email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon:
-            CustomSurffixIcon(svgIcon: "assets/icons/Location point.svg"),
-      ),
-    );
-  }
-
-  TextFormField buildPhoneNumberFormField() {
-    return TextFormField(
-      keyboardType: TextInputType.phone,
-      onSaved: (newValue) => phoneNumber = newValue,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPhoneNumberNullError);
-        }
-        return null;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPhoneNumberNullError);
-          return "";
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Phone Number",
-        hintText: "Enter your phone number",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
-      ),
-    );
-  }
-
-  TextFormField buildLastNameFormField() {
-    return TextFormField(
-      onSaved: (newValue) => lastName = newValue,
-      decoration: InputDecoration(
-        labelText: "Last Name",
-        hintText: "Enter your last name",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),
     );
   }
 
   TextFormField buildFirstNameFormField() {
     return TextFormField(
-      onSaved: (newValue) => firstName = newValue,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNamelNullError);
-        }
-        return null;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNamelNullError);
-          return "";
-        }
-        return null;
-      },
+      readOnly: true,
+      controller: _nameController,
       decoration: InputDecoration(
         labelText: "First Name",
-        hintText: "Enter your first name",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
