@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
+import 'package:http/http.dart' as http;
+
 import 'dart:async';
+import 'dart:convert';
 
 import '../../../size_config.dart';
-import 'package:flutter/material.dart';
+import '../../../services/flash_message.dart';
+import '../../../services/storage.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -65,6 +70,32 @@ class _BodyState extends State<Body> {
     } else {
       return 'Pausar';
     }
+  }
+
+  void _submitTime() async {
+    String? token = await secureStorage.read(key: 'jwt');
+    if (token == null) {
+      return;
+    }
+    final int duration = secondTotal + secondStart;
+
+    final response = await http.post(
+      Uri.parse('https://tcc2-api.herokuapp.com/stream'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${token}',
+      },
+      body: jsonEncode(<String, int>{
+        'duration': duration,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      showErrorFlash('Erro ao submeter Stream', context);
+    } else {
+      showSuccessFlash('Stream submetida com sucesso!', context);
+    }
+    Navigator.pushNamed(context, HomeScreen.routeName);
   }
 
   @override
@@ -133,6 +164,24 @@ class _BodyState extends State<Body> {
                         bottom: 20, top: 14, left: 20, right: 20),
                   ),
                 SizedBox(height: getProportionateScreenHeight(20)),
+                if (pressed)
+                  MaterialButton(
+                    onPressed: () {
+                      _submitTime();
+                    },
+                    child: Text(
+                      'Encerrar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    color: Color(0xFFFF7643),
+                    padding: EdgeInsets.only(
+                        bottom: 20, top: 14, left: 20, right: 20),
+                  ),
               ],
             ),
           ],
