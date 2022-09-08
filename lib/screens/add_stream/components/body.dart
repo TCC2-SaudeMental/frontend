@@ -94,8 +94,16 @@ class _BodyState extends State<Body> {
       showErrorFlash('Erro ao submeter Stream', context);
     } else {
       showSuccessFlash('Stream submetida com sucesso!', context);
+
+      hourStart = 0;
+      minuteStart = 0;
+      secondStart = 0;
+      secondTotal = 0;
+      pressed = false;
+      paused = false;
+
+      Navigator.pushNamed(context, 'Answer');
     }
-    Navigator.pushNamed(context, HomeScreen.routeName);
   }
 
   @override
