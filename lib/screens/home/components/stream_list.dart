@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'dart:convert';
 import '../../../services/storage.dart';
 import '../../../size_config.dart';
+import '../../../store/days.dart';
 
 class StreamList extends StatefulWidget {
   @override
@@ -13,10 +15,12 @@ class StreamList extends StatefulWidget {
 
 class _StreamListState extends State<StreamList> {
   List<dynamic> streams = [];
+  final DaysState controller = Get.put(DaysState());
 
   @override
   void initState() {
     super.initState();
+    ever(controller.rx_days, (value) => {retrieveStreams()});
     retrieveStreams();
   }
 
@@ -28,7 +32,8 @@ class _StreamListState extends State<StreamList> {
     EasyLoading.show(status: 'Carregando...');
 
     final response = await http.get(
-      Uri.parse('https://tcc2-api.herokuapp.com/stream/report'),
+      Uri.parse(
+          'https://tcc2-api.herokuapp.com/stream/report?days=${controller.rx_days.value + 1}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer ${token}'

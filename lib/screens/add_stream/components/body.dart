@@ -198,31 +198,3 @@ class _BodyState extends State<Body> {
     );
   }
 }
-//
-// return SafeArea(
-// child: SingleChildScrollView(
-// child: Center(
-// child: Column(
-// children: [
-// SizedBox(height: getProportionateScreenHeight(20)),
-// Text(
-// "Flutter é ruim dms",
-// style: TextStyle(
-// color: Colors.black,
-// fontSize: getProportionateScreenWidth(28),
-// fontWeight: FontWeight.bold,
-// ),
-// ),
-// FloatingActionButton.extended(
-// onPressed: () {
-// // Add your onPressed code here!
-// },
-// label: const Text('Iniciar stream'),
-// icon: const Icon(Icons.access_alarm),
-// backgroundColor: Colors.green,
-// ),
-// ],
-// ),
-// ),
-// ),
-// );

@@ -4,6 +4,7 @@ import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
 import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 
 import '../../../components/default_button.dart';
@@ -40,6 +41,7 @@ class _SignFormState extends State<SignForm> {
 
   void logIn() async {
     final String form_email = this.email.toString().replaceAll(' ', '');
+    EasyLoading.show(status: 'Carregando...');
     final response = await http.post(
       Uri.parse('https://tcc2-api.herokuapp.com/login'),
       headers: <String, String>{
@@ -61,6 +63,7 @@ class _SignFormState extends State<SignForm> {
       Navigator.pushNamed(context, HomeScreen.routeName);
       showSuccessFlash("Bem vindo", context);
     }
+    EasyLoading.dismiss();
   }
 
   @override
