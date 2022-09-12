@@ -56,7 +56,7 @@ class Body extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.03),
-                Text("De maneira geral, estou satisfeito(a) com minha vida estes úlitmos dias.",
+                Text("De maneira geral, estou satisfeito(a) com minha vida estes últimos dias.",
                     style: questionTextStyle),
                 SizedBox(height: SizeConfig.screenHeight * 0.06),
                 DefaultButton(
